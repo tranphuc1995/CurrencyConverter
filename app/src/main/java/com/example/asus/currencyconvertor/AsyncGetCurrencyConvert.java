@@ -1,5 +1,7 @@
 package com.example.asus.currencyconvertor;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.AsyncTask;
 import android.widget.TextView;
 
@@ -41,6 +43,20 @@ public class AsyncGetCurrencyConvert extends AsyncTask<Void, Void, String> {
     private String fromCurrent;
     private String toCurrent;
     private TextView tvResult;
+    private ProgressDialog pDialog;
+    private Context context;
+
+    @Override
+    protected void onPreExecute()
+    {
+        super.onPreExecute();
+        pDialog = new ProgressDialog(context);
+        pDialog.setMessage("Loading...");
+        pDialog.setIndeterminate(false);
+        pDialog.setCancelable(false);
+        pDialog.show();
+    }
+
 
     @Override
     protected String doInBackground(Void... params) {
@@ -55,15 +71,20 @@ public class AsyncGetCurrencyConvert extends AsyncTask<Void, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
+        if (pDialog != null)
+        {
+            pDialog.dismiss();
+        }
         Document document = getDomElement(result);
         String change = document.getDocumentElement().getChildNodes().item(0).getNodeValue();
         tvResult.setText("1 "+fromCurrent +" = " + change + " " + toCurrent);
     }
 
-    public AsyncGetCurrencyConvert(String fromCurrent, String toCurrent, TextView tvResult) {
+    public AsyncGetCurrencyConvert(String fromCurrent, String toCurrent, TextView tvResult,Context context) {
         this.fromCurrent = fromCurrent;
         this.toCurrent = toCurrent;
         this.tvResult = tvResult;
+        this.context = context;
     }
 
     private String downloadUrl(String strUrl) throws IOException {

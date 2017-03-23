@@ -1,5 +1,7 @@
 package com.example.asus.currencyconvertor;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.view.menu.ActionMenuItemView;
@@ -23,8 +25,15 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        addControls();
-        addEvents();
+        if(!CommonUtils.checkInternet(getApplicationContext())){
+            Intent intent = new Intent(MainActivity.this,ErrorNetwork.class);
+            startActivity(intent);
+            finish();
+        }
+        else {
+            addControls();
+            addEvents();
+        }
     }
 
     private void addEvents() {
@@ -33,7 +42,8 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 new AsyncGetCurrencyConvert(snFromCurrency.getSelectedItem().toString().substring(0,3)
                         ,snToCurrency.getSelectedItem().toString().substring(0,3)
-                        ,tvResult).execute();
+                        ,tvResult
+                        ,MainActivity.this).execute();
             }
         });
     }
